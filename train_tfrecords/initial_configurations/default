@@ -1,0 +1,51 @@
+# /home/rosalie/Documents/Projects/train_ohe_TF/train_ohe_tf/data/
+
+# DATA
+train_data_path = /train_ohe_tf/data/
+start_date      = 2019.10.18.00.00
+train_period    = -1
+to_ohe          = 0
+random_seed     = 8888
+num_cores       = 8
+train_ratio     = 0.7
+valid_ratio     = 0.15
+batch_size      = 10000
+prefetch_size   = 1
+
+# MODEL
+model_name          = DNN
+loss                = 40
+hidden_units        = [1024, 32]
+learning_rate       = 0.0075
+decay_step          = 100
+decay_rate          = 0.9382
+Lambda              = 0.1919
+gamma               = 1.8878
+beta                = 1.0
+drop_rate           = 0.4944
+embedding_units     = [3, 3, 3, 5, 5, 5, 5]
+embedding_units_ohe = [10, 10]
+
+# TRAINING
+new_run                   = 1
+local_run                 = 1
+tuning                    = 0
+has_gpu                   = 0
+is_test                   = 1
+model                     = LR
+num_epochs_min            = 1
+num_epochs                = 1
+validation_length         = 10
+test_length               = 5
+earlystop_check_frequency = 10
+earlystop_duration        = 10
+valid_loss_delta          = 0.01
+num_threshold_buffer      = 3
+percentile_threshold      = 8
+
+# DIRECTORY
+save_dir         = ./Outputs/
+load_dir         = latest
+store_dir        = latest
+result_dir       = result.csv
+builder_save_dir = builder_save
