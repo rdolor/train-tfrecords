@@ -9,10 +9,10 @@ import tensorflow as tf
 import random
 import logging
 
-from train_ohe_tf.config import NUM_WEEKDAY, NUM_REGION, NUM_CITY, NUM_EXCHANGE, NUM_SLOTFORMAT, NUM_USERTAG
-from train_ohe_tf.config import features_dtype_int, numerical_features
+from train_tfrecords.config import NUM_WEEKDAY, NUM_REGION, NUM_CITY, NUM_ADEXCHANGE, NUM_SLOTFORMAT, NUM_USERTAG
+from train_tfrecords.config import features_dtype_int, numerical_features
 
-#from config import NUM_WEEKDAY, NUM_REGION, NUM_CITY, NUM_EXCHANGE, NUM_SLOTFORMAT, NUM_USERTAG
+#from config import NUM_WEEKDAY, NUM_REGION, NUM_CITY, NUM_adexchange, NUM_SLOTFORMAT, NUM_USERTAG
 #from config import features_dtype_int, numerical_features
 
 
@@ -110,7 +110,7 @@ class DataPipeline():
                 ohe_weekday    = tf.cast(tf.one_hot(sample["weekday"] , depth=NUM_WEEKDAY,   on_value=1, axis=1), dtype=tf.int64)
                 ohe_region     = tf.cast(tf.one_hot(sample["region"] , depth=NUM_REGION,          on_value=1, axis=1), dtype=tf.int64)
                 ohe_city       = tf.cast(tf.one_hot(sample["city"]   , depth=NUM_CITY,          on_value=1, axis=1), dtype=tf.int64)
-                ohe_exchange   = tf.cast(tf.one_hot(sample["adexchange"] , depth=NUM_EXCHANGE,         on_value=1, axis=1), dtype=tf.int64)
+                ohe_adexchange   = tf.cast(tf.one_hot(sample["adexchange"] , depth=NUM_ADEXCHANGE,         on_value=1, axis=1), dtype=tf.int64)
                 ohe_slotformat = tf.cast(tf.one_hot(sample["slotformat"] , depth=NUM_SLOTFORMAT,         on_value=1, axis=1), dtype=tf.int64)
 
                 sample["usertag"] = tf.reshape(sample["usertag"],[1,-1])
@@ -118,11 +118,11 @@ class DataPipeline():
                 ohe_weekday    = tf.reshape(ohe_weekday,[tf.shape(ohe_weekday)[0],-1])
                 ohe_region     = tf.reshape(ohe_region,[tf.shape(ohe_region)[0],-1])
                 ohe_city       = tf.reshape(ohe_city,[tf.shape(ohe_city)[0],-1])
-                ohe_exchange   = tf.reshape(ohe_exchange,[tf.shape(ohe_exchange)[0],-1])
+                ohe_adexchange   = tf.reshape(ohe_adexchange,[tf.shape(ohe_adexchange)[0],-1])
                 ohe_slotformat = tf.reshape(ohe_slotformat,[tf.shape(ohe_slotformat)[0],-1])
                 
                 x_ohe = tf.concat([sample["usertag"],
-                        ohe_weekday, ohe_region, ohe_city, ohe_exchange, ohe_slotformat],axis=1)
+                        ohe_weekday, ohe_region, ohe_city, ohe_adexchange, ohe_slotformat],axis=1)
 
                 x_ohe = tf.cast(x_ohe, tf.float32)
 
