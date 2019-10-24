@@ -1,5 +1,31 @@
 
 """ This file contains the (hyper)parameters used to make the whole PyTrain run.
+
+Data information:
+feature = click,          shape = (10000, 1),  Unique count = 2,   min = 0,   max = 1
+feature = weekday,        shape = (10000, 1),  Unique count = 1,   min = 4,   max = 4
+feature = region,         shape = (10000, 1),  Unique count = 35,  min = 0,   max = 395
+feature = city,           shape = (10000, 1),  Unique count = 359, min = 0,   max = 399
+feature = adexchange,     shape = (10000, 1),  Unique count = 3,   min = 1,   max = 3
+feature = slotformat,     shape = (10000, 1),  Unique count = 2,   min = 0,   max = 1
+feature = hour,           shape = (10000, 1),  Unique count = 1,   min = 0,   max = 0
+feature = slotwidth,      shape = (10000, 1),  Unique count = 6,   min = 160, max = 1000
+feature = slotheight,     shape = (10000, 1),  Unique count = 4,   min = 90,  max = 600
+feature = slotvisibility, shape = (10000, 1),  Unique count = 4,   min = 0,   max = 255
+feature = slotprice,      shape = (10000, 1),  Unique count = 46,  min = 0,   max = 280
+feature = usertag,        shape = (10000, 39), Unique count = 45,  min = -1,  max = 16706
+
+python -m train_tfrecords.main
+pytest train_tfrecords/test/test_utils.py
+pytest train_tfrecords/test/test_data_generator.py
+
+tuning: 
+    cd train_tfrecords/tune
+    nnictl create --config tune_config.yml --port <PORT_NUMBER>
+
+changed:
+-fixed DNN training
+-added nni tuning
 """
 
 import os
@@ -8,11 +34,8 @@ import logging
 import tensorflow as tf
 import nni
 from configargparse import ArgParser
-#from utils import parse_date, find_training_data, find_latest_model_dir
 from train_tfrecords.utils import parse_date, find_training_data, find_latest_model_dir
 
-
-#print('here===================> ', os.getcwd()) #/home/rosalie/Documents/Projects/train_TFRecords
 
 # Features
 features_dtype_int = ['click', 'weekday', 'region', 'city', 'adexchange', 'slotformat', 'hour', 'slotwidth',
@@ -28,17 +51,17 @@ numerical_features = ['hour', 'slotwidth',
 
 
 # Categorical features = number of elements
-NUM_WEEKDAY = 7
-NUM_REGION = 35
-NUM_CITY = 359
-NUM_ADEXCHANGE = 3
-NUM_SLOTFORMAT = 2
-NUM_USERTAG = 45
+NUM_WEEKDAY              = 8
+NUM_REGION               = 396
+NUM_CITY                 = 400
+NUM_ADEXCHANGE           = 4
+NUM_SLOTFORMAT           = 3
+NUM_USERTAG              = 16707
 NUM_CATEGORICAL_FEATURES = NUM_WEEKDAY+NUM_REGION + \
     NUM_CITY+NUM_ADEXCHANGE+NUM_SLOTFORMAT+NUM_USERTAG
 
-DATA_PATH = os.getcwd() + '/train_tfrecords/data/'
-START_DATE = '2019.10.01.00.00'
+DATA_PATH    = os.getcwd() + '/train_tfrecords/data/'
+START_DATE   = '2019.10.01.00.00'
 TRAIN_PERIOD = -1
 
 
@@ -54,8 +77,6 @@ def ParseArgs():
                             default=START_DATE,   type=str, help='Training start date')
     data_parse.add_argument('--train_period',       dest='train_period',
                             default=TRAIN_PERIOD, type=int, help='Time period of training file is used')
-    data_parse.add_argument('--to_ohe',             dest='to_ohe',             default=1,
-                            type=int,  help='1: To one-hot-encode the features, 0: otherwise, use embeddings')
     data_parse.add_argument('--random_seed',        dest='random_seed',        default=8888,
                             type=int, help='Random seed used for shuffling the list of training files')
     data_parse.add_argument('--num_cores',          dest='num_cores',
@@ -71,8 +92,8 @@ def ParseArgs():
 
     # Model
     model_parse = parser.add_argument_group('Model setting')
-    model_parse.add_argument('--model_name',      dest='model_name',
-                             default='NULL',        type=str,   help='Name of model')
+    model_parse.add_argument('--model',                dest='model',               default='DNN',
+                             type=str,   help='Select the model to train e.g. DNN; note that this version only has DNN')
     model_parse.add_argument('--loss',            dest='loss',              default=40,
                              type=int,   help="Setting of loss function '10','11','12','20','21','22','30','31','32','40'")
     model_parse.add_argument('--hidden_units',    dest='hidden_units',      default=[
@@ -91,10 +112,10 @@ def ParseArgs():
                              default=1.,            type=float, help='Regularization parameter')
     model_parse.add_argument('--drop_rate',       dest='drop_rate',
                              default=0.5,            type=float, help='dropout rate')
-    model_parse.add_argument('--embedding_units', dest='embedding_units',   default=[2, 5, 10, 3, 2], type=int, nargs='+',
+    model_parse.add_argument('--embedding_units', dest='embedding_units',   default=[1, 35, 359, 3, 2], type=int, nargs='+',
                              help='List containing the number of embedding units to use for features (in order): [weekday, region, city, adexchange, slotformat]; this replaces the one hot encoding')
     model_parse.add_argument('--embedding_units_ohe', dest='embedding_units_ohe',   default=[
-                             10], type=int, nargs='+', help='List containing the number of embedding units to use for OHE features (in order): usertag')
+                             45], type=int, nargs='+', help='List containing the number of embedding units to use for OHE features (in order): usertag')
 
     # Training
     train_parse = parser.add_argument_group('Training hyperparameters')
@@ -108,8 +129,6 @@ def ParseArgs():
                              default=0,     type=int,   help='1 if GPU is present, else 0')
     train_parse.add_argument('--is_test',              dest='is_test',             default=0,
                              type=int,   help='1 if the trained model will be evaluated, else 0')
-    train_parse.add_argument('--model',                dest='model',               default='DNN',
-                             type=str,   help='Select the model to train e.g. DNN; note that this version only has DNN')
     train_parse.add_argument('--num_epochs_min',       dest='num_epochs_min',
                              default=100,   type=float,   help='Minimum number of training epochs')
     train_parse.add_argument('--num_epochs',           dest='num_epochs',
@@ -152,7 +171,7 @@ TF_files = find_training_data(
     args['start_date'], args['train_period'], os.getcwd() + args['train_data_path'])
 
 tfrecordfiles = list(set(TF_files))
-#print('tffile', tfrecordfiles)
+
 
 # Identify whether it's using NNI tuning mode
 if args['tuning'] == 1:
@@ -173,15 +192,24 @@ args['num_training_min'] = int(
     training_size/args['batch_size']) * args['num_epochs_min']
 args['num_training'] = int(
     training_size/args['batch_size']) * args['num_epochs']
-args['validation_frequency'] = int((args['num_training_min'])/20)
+args['validation_frequency'] = int((args['num_training_min'])/4)
 if args['validation_frequency'] <= 0:
     args['validation_frequency'] = 1
 args['print_train_iter'] = args['validation_frequency']
 args['save_model'] = args['validation_frequency']
 
+# 1: To one-hot-encode the features, 0: otherwise, use embeddings
+if args['model'] == "LR":
+    args['to_ohe'] = 1
+elif args['model'] == "DNN":
+    args['to_ohe'] = 0
+else:
+    logging.info("Check model input: Model is neither LR or DNN")
+
 # HParams are used to group the hyper parameters
 model_hps = tf.contrib.training.HParams(
     num_features=NUM_CATEGORICAL_FEATURES + 5,
+    model=args['model'],
     loss=args['loss'],
     hidden_units=args['hidden_units'],
     learning_rate=args['learning_rate'],
@@ -198,7 +226,7 @@ model_hps = tf.contrib.training.HParams(
 train_hps = tf.contrib.training.HParams(
     has_gpu=args['has_gpu'],
     is_test=args['is_test'],
-    model=args['model'],
+    model=model_hps.model,
     num_training_min=args['num_training_min'],
     num_training=args['num_training'],
     print_train_iter=args['print_train_iter'],
@@ -230,6 +258,7 @@ data_pipeline_hps = tf.contrib.training.HParams(
     prefetch_size=args['prefetch_size'])
 
 # Set model directory hyperparameters
+args['model_name'] = args['model'] 
 if args['store_dir'] == 'latest':
     store_dir = args['model_name'] + '_' + \
         parse_date('now').strftime("%Y-%m-%dT%H:%M:%S")

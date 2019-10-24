@@ -341,7 +341,7 @@ class Training:
 
     def compute_cutpoint(self, tr_ys, tr_y_hat):
         """ Computes the threshold where to cut the probabilites. """
-        cutpoint_avg = 0,0
+        cutpoint_avg = 0
         y_hat_percentile = np.percentile(tr_y_hat, q=np.arange(0, 100, 10))
         threshold = y_hat_percentile[self.train_hps.percentile_threshold]
         self.threshold_list.append(threshold)

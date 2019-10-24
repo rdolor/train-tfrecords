@@ -4,16 +4,15 @@
 train_data_path = /train_tfrecords/data/
 start_date      = 2019.10.18.00.00
 train_period    = -1
-to_ohe          = 0
 random_seed     = 8888
 num_cores       = 8
 train_ratio     = 0.7
 valid_ratio     = 0.15
-batch_size      = 10000
+batch_size      = 256
 prefetch_size   = 1
 
 # MODEL
-model_name          = DNN
+model               = LR
 loss                = 40
 hidden_units        = [1024, 32]
 learning_rate       = 0.0075
@@ -23,7 +22,7 @@ Lambda              = 0.1919
 gamma               = 1.8878
 beta                = 1.0
 drop_rate           = 0.4944
-embedding_units     = [7, 35, 359, 3, 2]
+embedding_units     = [2, 35, 359, 3, 2]
 embedding_units_ohe = [45]
 
 # TRAINING
@@ -32,11 +31,10 @@ local_run                 = 1
 tuning                    = 0
 has_gpu                   = 0
 is_test                   = 1
-model                     = DNN
 num_epochs_min            = 0.5
 num_epochs                = 0.5
-validation_length         = 10
-test_length               = 5
+validation_length         = 2
+test_length               = 2
 earlystop_check_frequency = 10
 earlystop_duration        = 10
 valid_loss_delta          = 0.01

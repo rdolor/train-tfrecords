@@ -1,0 +1,22 @@
+authorName: pytrain
+experimentName: dnn_newinputs
+trialConcurrency: 1
+maxExecDuration: 168h
+maxTrialNum: 1000
+#choice: local, remote, pai
+trainingServicePlatform: local
+searchSpacePath: search_space.json
+#choice: true, false
+useAnnotation: false
+tuner:
+  #choice: TPE, Random, Anneal, Evolution, BatchTuner
+  #SMAC (SMAC should be installed through nnictl)
+  builtinTunerName: TPE
+  classArgs:
+    #choice: maximize, minimize
+    #currently set as maximize, for AUC as metric
+    optimize_mode: maximize
+trial:
+  command: python -m train_tfrecords.main
+  codeDir: ../../
+  gpuNum: 0
