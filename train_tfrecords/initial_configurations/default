@@ -1,9 +1,12 @@
-# /home/rosalie/Documents/Projects/train_ohe_TF/train_ohe_tf/data/
+# CORE
+start_date             = 2019.10.01.00.00
+train_period           = -1 
+new_run                = 1
+local_run              = 1
+tuning                 = 0
 
 # DATA
 train_data_path = /train_tfrecords/data/
-start_date      = 2019.10.18.00.00
-train_period    = -1
 random_seed     = 8888
 num_cores       = 8
 train_ratio     = 0.7
@@ -26,9 +29,6 @@ embedding_units     = [2, 35, 359, 3, 2]
 embedding_units_ohe = [45]
 
 # TRAINING
-new_run                   = 1
-local_run                 = 1
-tuning                    = 0
 has_gpu                   = 0
 is_test                   = 1
 num_epochs_min            = 0.5

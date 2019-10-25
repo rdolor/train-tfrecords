@@ -23,9 +23,17 @@ tuning:
     cd train_tfrecords/tune
     nnictl create --config tune_config.yml --port <PORT_NUMBER>
 
+build docker:
+bash build.sh
+docker run -it <IMAGE ID> bash
+either:
+    bash iter_train.sh; OR
+    python -m train_tfrecords.main
+
 changed:
 -fixed DNN training
 -added nni tuning
+-added iter_train.sh
 """
 
 import os
@@ -69,14 +77,24 @@ def ParseArgs():
     parser = ArgParser(default_config_files=[
                        os.getcwd() + '/train_tfrecords/initial_configurations/default'])
 
+    # Core settings
+    core_parse = parser.add_argument_group('Core setting')
+    core_parse.add_argument('-s', '--start_date',         dest='start_date',
+                            default=START_DATE,   type=str, help='Training start date')
+    core_parse.add_argument('-p','--train_period',       dest='train_period',
+                            default=TRAIN_PERIOD, type=int, help='Time period of training file is used')
+    core_parse.add_argument('-n','--new_run',              dest='new_run',         default=1,
+                             type=int, help='If the model checkpoint is erased to run new model')
+    core_parse.add_argument('-l','--local_run',            dest='local_run',       default=1,
+                             type=int, help='If the parameter JSON file is kept locally insteat to  redis')
+    core_parse.add_argument('-nni','--tuning',               dest='tuning',          default=0,
+                             type=int, help='Whether or not to peform hyper parameter tuning')
+
     # Data
     data_parse = parser.add_argument_group('Data setting')
     data_parse.add_argument('--train_data_path',    dest='train_data_path',
                             default=DATA_PATH,  type=str, help='Directory where the training files are located')
-    data_parse.add_argument('--start_date',         dest='start_date',
-                            default=START_DATE,   type=str, help='Training start date')
-    data_parse.add_argument('--train_period',       dest='train_period',
-                            default=TRAIN_PERIOD, type=int, help='Time period of training file is used')
+    
     data_parse.add_argument('--random_seed',        dest='random_seed',        default=8888,
                             type=int, help='Random seed used for shuffling the list of training files')
     data_parse.add_argument('--num_cores',          dest='num_cores',
@@ -119,12 +137,6 @@ def ParseArgs():
 
     # Training
     train_parse = parser.add_argument_group('Training hyperparameters')
-    train_parse.add_argument('--new_run',              dest='new_run',         default=1,
-                             type=int, help='If the model checkpoint is erased to run new model')
-    train_parse.add_argument('--local_run',            dest='local_run',       default=1,
-                             type=int, help='If the parameter JSON file is kept locally insteat to  redis')
-    train_parse.add_argument('--tuning',               dest='tuning',          default=0,
-                             type=int, help='Whether or not to peform hyper parameter tuning')
     train_parse.add_argument('--has_gpu',              dest='has_gpu',
                              default=0,     type=int,   help='1 if GPU is present, else 0')
     train_parse.add_argument('--is_test',              dest='is_test',             default=0,
