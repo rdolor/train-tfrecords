@@ -1,0 +1,5 @@
+{
+    "loss":{"_type" : "choice","_value":[30,40]},
+    "batch_size":{"_type":"choice","_value":[128,256]},
+    "learning_rate":{"_type":"uniform","_value":[0.0001,0.01]}
+}
