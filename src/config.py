@@ -16,11 +16,10 @@ feature = slotprice,      shape = (10000, 1),  Unique count = 46,  min = 0,   ma
 feature = usertag,        shape = (10000, 39), Unique count = 45,  min = -1,  max = 16706
 
 python -m src.main
-pytest train_tfrecords/test/test_utils.py
-pytest train_tfrecords/test/test_data_generator.py
+pytest tests
 
 tuning: 
-    cd train_tfrecords/tune
+    cd tune
     nnictl create --config tune_config.yml --port <PORT_NUMBER>
 
 build docker:

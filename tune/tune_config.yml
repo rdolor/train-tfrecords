@@ -17,6 +17,6 @@ tuner:
     #currently set as maximize, for AUC as metric
     optimize_mode: maximize
 trial:
-  command: python -m train_tfrecords.main -nni=1 -s=2019.10.18.00.00
-  codeDir: ../../
+  command: python -m src.main -nni=1 -s=2019.10.18.00.00
+  codeDir: ../
   gpuNum: 0

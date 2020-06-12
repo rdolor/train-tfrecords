@@ -1,16 +1,13 @@
 
-from train_tfrecords.data_generator import DataPipeline
-from train_tfrecords.config import data_pipeline_hps, model_hps
+from src.data_generator import DataPipeline
+from src.config import data_pipeline_hps, model_hps
 
 import os
 import numpy as np
 
-#print(data_pipeline_hps.train_data_path)
-#print(data_pipeline_hps.data_file)
-
 def test_data_pipeline_ohe():
     #data_pipeline_hps['data_file'] = [os.getcwd() + '/train_ohe_tf/test/data/train_data_2019-10-17T17:09:12.637045.tf']
-    data_pipeline_hps.data_file = [os.getcwd() + '/train_tfrecords/test/data/train_data_2019-10-17T17:09:12.637045.tf']
+    data_pipeline_hps.data_file = [os.getcwd() + '/tests/data/train_data_2019-10-17T17:09:12.637045.tf']
     data_pipeline_hps.batch_size = 10
     data_pipeline_hps.to_ohe = 1
     
