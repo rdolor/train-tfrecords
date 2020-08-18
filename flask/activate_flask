@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+gunicorn --log-config logging.conf -c gunicorn_config.py service.core:app

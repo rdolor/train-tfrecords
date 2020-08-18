@@ -1,6 +1,6 @@
 # Customized training using TFRecords data format
 
-This is a project using TF to train and test some TFRecords data. The models and training pipeline are customized.
+This is a project using TF to train and test some TFRecords data. The models and training pipeline for click-through rate prediction are customized.
 
 ## Dataset
 The  data comes from the text files of the  standardized data format of [iPinYou RTB dataset](https://github.com/wnzhang/make-ipinyou-data). Using [this project](https://github.com/rdolor/data-to-tfrecords), text files are transformed into TFRecords file.
@@ -34,10 +34,10 @@ feature = usertag,        shape = (10000, 39), Unique count = 45,  min = -1,  ma
 **2. Using docker**
 
 * Build the image: `make build`
-* Create a container: `docker run -it train-tfrecords:master bash`
+* Create a container: `docker run -it --rm train_tfrecords:master bash`
 
 ## How to run the program
-* Testing the code: `make test`
+* Testing the code: `make tests`
 * Training and Testing on data:
     - For easy configurations, edit: `src/initial_configurations/default`
     - Run training: `make train`
