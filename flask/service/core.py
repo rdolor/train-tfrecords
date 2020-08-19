@@ -21,8 +21,8 @@ def server_error(e):
     See logs for full stacktrace.
     """.format(e), 500
 
-@app.route('/train/<start_date>/<train_period>/<arguments>', methods=["POST"])
-def main(start_date, train_period, arguments):
+@app.route('/train/<start_date>/<train_period>', methods=["POST"])
+def train(start_date, train_period):
     """activate pytrain_esstimator to start training
 
     Args:
@@ -34,14 +34,13 @@ def main(start_date, train_period, arguments):
         json: [description]
     """
     try:
-        os.popen("cd '../src' && python main.py -s={0} -p={1} {2} &".
-                 format(start_date, train_period, arguments))
+        os.popen("cd '../../' && python -m src.main -s={0} -p={1} &".
+                 format(start_date, train_period))
         # os.popen("cd '../pytrain_estimator' && python main.py -s=" + start_date +
         #          " -t=" + str(train_period) +
         #          " " + str(arguments) + " &")
         return jsonify("Start new training process with setting start date as " + start_date +
-                       ", training period as " + str(train_period) +
-                       ", other arguments as " + arguments)
+                       ", training period as " + str(train_period))
     except Exception as ex:
         logging.error(request.args)
         logging.error("Invalid argument parameters: %s", ex, exc_info=True)
@@ -56,8 +55,7 @@ def get_result_csv():
         file: csv
     """
     try:
-        file = "../../outputs/results.csv"
-        return send_file(file)
+        return send_file("../../outputs/result.csv")
     except Exception as ex:
         logging.error(request.args)
         return 'Some error happened: {0}'.format(ex)

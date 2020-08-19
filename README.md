@@ -1,6 +1,8 @@
 # Customized training using TFRecords data format
 
-This is a project using TF to train and test some TFRecords data. The models and training pipeline for click-through rate prediction are customized.
+This project uses TensorFlow and some TFRecords data for training. The models and training pipeline for click-through rate prediction are customized. 
+
+Flask is used to create a service that can (re)train a model. 
 
 ## Dataset
 The  data comes from the text files of the  standardized data format of [iPinYou RTB dataset](https://github.com/wnzhang/make-ipinyou-data). Using [this project](https://github.com/rdolor/data-to-tfrecords), text files are transformed into TFRecords file.
@@ -31,12 +33,19 @@ feature = usertag,        shape = (10000, 39), Unique count = 45,  min = -1,  ma
         * install packages exactly as specified in **Pipfile.lock**: `pipenv sync`
         * install using the **Pipfile**, including the dev packages: `pipenv install --dev`
 
-**2. Using docker**
 
-* Build the image: `make build`
-* Create a container: `docker run -it --rm train_tfrecords:master bash`
+**2. Using docker**
+*   To build the image: `make build`
+*   To create the container: `docker-compose up -d`
+    - Note that this will already trigger the Flask service app.
+    - To get the exact IP address, try running `docker-machine inspect default | grep IPAddress` and then use this address instead of `localhost`.
+*   To get into the container: `docker exec -it <container_name> bash`
+*   To check the logs, especially when training the model: `docker logs -f <container_name>`
+*   To force stop the container: `docker rm -f <container_name>`
+
 
 ## How to run the program
+
 * Testing the code: `make tests`
 * Training and Testing on data:
     - For easy configurations, edit: `src/initial_configurations/default`
@@ -45,9 +54,10 @@ feature = usertag,        shape = (10000, 39), Unique count = 45,  min = -1,  ma
     - Go inside the folder `cd tune/`.
     - Edit the configurations in `search_space.json` and `tune_config.yml`.
     - Run the tuner: `nnictl create --config tune_config.yml --port <PORT_NUMBER>`
-
-
-
-
-
-
+* How to use the Flask service:
+    - To check if it is working, GET `http://localhost:7777/`, should result to:
+    ```
+    Hello World! <3,Flask
+    ```
+    - To (re)train a model, POST on `http://localhost:7777/train/<start_date>/<training_period>`.
+    - To check the performance metrics of the trained models, GET `http://localhost:7777/monitor/get_result_csv`.

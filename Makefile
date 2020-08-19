@@ -2,7 +2,7 @@ IMAGE_NAME=train_tfrecords:master
 
 build ::
 	echo ${IMAGE_NAME}
-	docker build -f docker/Dockerfile -t ${IMAGE_NAME} .
+	docker build -f ./docker/Dockerfile -t ${IMAGE_NAME} .
 	#docker push ${IMAGE_NAME}
 
 tests ::

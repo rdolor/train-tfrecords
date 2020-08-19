@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  pytrain_tfrecords:
+    image: train_tfrecords:master
+    environment:
+      - PORT=7777
+    #volumes:
+      #- /source/tests/data/:/tests/data/
+      # - /etc/localtime:/etc/localtime:ro
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/hosts:/etc/hosts
+    ports:
+      - 7777:7777
