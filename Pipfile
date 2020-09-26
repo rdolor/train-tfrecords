@@ -10,7 +10,7 @@ pylint   = "*"
 v = {editable = true,version = "*"}
 
 [packages]
-tensorflow     = "==1.12.2"
+tensorflow     = "==1.15.4"
 nni            = "==0.9.1.1"
 configargparse = "==0.14.0"
 flask          = "==1.0.2"
